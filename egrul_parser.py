@@ -19,8 +19,8 @@ class EgrulParser:
         self.home_url = "https://egrul.nalog.ru"
         self.search_url = "https://egrul.nalog.ru/search-result/"
         # Generating headers
-        self.HEADERS = Headers(browser="chrome", os="win", headers=True).generate()
-        
+        self.HEADERS = Headers(browser="chrome", os="win",
+                               headers=True).generate()
 
     def try_post(self, url: str, data: dict, retry: int = 5) -> requests.models.Response:
         """Makes 'post' requests to the url with retry logic in case of failure."""
@@ -37,7 +37,7 @@ class EgrulParser:
                 raise Exception("Retries exhausted")
         else:
             return response
-        
+
     def try_get(self, url: str, retry: int = 5) -> requests.models.Response:
         """Makes get-requests to the url with retry logic in case of failure."""
         try:
@@ -57,16 +57,18 @@ class EgrulParser:
     def check_numbers(self, numbers: Union[list, tuple]) -> None:
         """Takes a list or tuple of numbers as an argument 
         and check each number in the list for expiration. 
-        If there is client info available, it is added to the "data" list, 
-        otherwise it is added to the "wrong_numbers" list. 
-        """
+        If there is client_info available, it is added to the "data" list, 
+        otherwise number is added to the "wrong_numbers" list."""
+
         self.data = []
-        self.wrong_numbers = []
+        self.wrong_numbers = ['.']
         pbar = tqdm(numbers, desc="Total")
         for ogrn in pbar:
             try:
-                token = self.try_post(self.home_url, data={"query": ogrn}).json()["t"]
-                client_info = self.try_get(self.search_url + token).json()["rows"]
+                token = self.try_post(self.home_url, data={
+                                      "query": ogrn}).json()["t"]
+                client_info = self.try_get(
+                    self.search_url + token).json()["rows"]
                 if len(client_info) != 0:
                     self.data = self.data + client_info
                 else:
@@ -75,3 +77,18 @@ class EgrulParser:
             except:
                 continue
             pbar.set_description(f"Processing '{ogrn}'")
+
+    def get_expired(self) -> list:
+        '''Returns expired ogrn numbers from found by check_numbers()'''
+        try:
+            expired = [item for item in self.data if 'e' in item]
+            return expired
+        except AttributeError:
+            raise Exception('Run check_numbers() at first')
+
+    def get_wrong_numbers(self) -> list:
+        '''Returns wrong ogrn numbers from found by check_numbers()'''
+        try:
+            return self.wrong_numbers[1:]
+        except AttributeError:
+            raise Exception('Run check_numbers() at first')
