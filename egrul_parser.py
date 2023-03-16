@@ -79,15 +79,15 @@ class EgrulParser:
             pbar.set_description(f"Processing '{ogrn}'")
 
     def get_expired(self) -> list:
-        '''Returns expired ogrn numbers from found by check_numbers()'''
+        '''Returns expired ogrn numbers found by check_numbers()'''
         try:
-            expired = [item for item in self.data if 'e' in item]
+            expired = [item['o'] for item in self.data if 'e' in item]
             return expired
         except AttributeError:
             raise Exception('Run check_numbers() at first')
 
     def get_wrong_numbers(self) -> list:
-        '''Returns wrong ogrn numbers from found by check_numbers()'''
+        '''Returns wrong ogrn numbers found by check_numbers()'''
         try:
             return self.wrong_numbers[1:]
         except AttributeError:
