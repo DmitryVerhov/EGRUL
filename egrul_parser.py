@@ -1,5 +1,4 @@
 import requests
-import pandas as pd
 from time import sleep
 from random import randint
 from fake_headers import Headers
@@ -92,3 +91,4 @@ class EgrulParser:
             return self.wrong_numbers[1:]
         except AttributeError:
             raise Exception('Run check_numbers() at first')
+
