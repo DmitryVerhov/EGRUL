@@ -18,7 +18,8 @@ class EgrulParser:
         self.home_url = "https://egrul.nalog.ru"
         self.search_url = "https://egrul.nalog.ru/search-result/"
         # Generating headers
-        self.HEADERS = Headers(browser="chrome", os="win",
+        self.HEADERS = Headers(browser="chrome",
+                               os="win",
                                headers=True).generate()
 
     def try_post(self, url: str, data: dict, retry: int = 5) -> requests.models.Response:
@@ -53,27 +54,33 @@ class EgrulParser:
         else:
             return response
 
-    def check_numbers(self, numbers: Union[list, tuple]) -> None:
+    def check_numbers(self,
+                      numbers: Union[list, tuple],
+                      progress_bar: bool = True) -> None:
         """Takes a list or tuple of numbers as an argument 
         and check each number in the list for expiration. 
         If there is client_info available, it is added to the "data" list, 
         otherwise number is added to the "wrong_numbers" list."""
 
-        self.data = []
-        self.wrong_numbers = ['.']
-        pbar = tqdm(numbers, desc="Total")
+        self.data = []  # here clients info will be stored
+        self.wrong_numbers = ['.']  # list for failed numbers
+        # Initialise progress bar
+        pbar = tqdm(numbers, desc = "Total", disable = not progress_bar)
         for ogrn in pbar:
             try:
-                token = self.try_post(self.home_url, data={
-                                      "query": ogrn}).json()["t"]
-                client_info = self.try_get(
-                    self.search_url + token).json()["rows"]
+                # Getting client token, using his orgn number 
+                token = self.try_post(self.home_url,
+                                      data={"query": ogrn}).json()["t"]
+
+                client_url = self.search_url + token
+                client_info = self.try_get(client_url).json()["rows"]
                 if len(client_info) != 0:
                     self.data = self.data + client_info
                 else:
                     self.wrong_numbers.append(ogrn)
                 sleep(randint(1, 5))
             except:
+                self.wrong_numbers.append(ogrn)
                 continue
             pbar.set_description(f"Processing '{ogrn}'")
 
@@ -91,4 +98,3 @@ class EgrulParser:
             return self.wrong_numbers[1:]
         except AttributeError:
             raise Exception('Run check_numbers() at first')
-
