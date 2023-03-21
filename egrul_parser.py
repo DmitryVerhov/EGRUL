@@ -83,7 +83,7 @@ class EgrulParser:
             except:
                 self.wrong_numbers.append(ogrn)
                 continue
-            pbar.set_description(f"Processing '{ogrn}'")
+            pbar.set_description(f"Processing {ogrn}")
 
     def get_expired(self) -> list:
         '''Returns expired ogrn numbers found by check_numbers()'''
