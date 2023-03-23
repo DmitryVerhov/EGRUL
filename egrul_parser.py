@@ -87,15 +87,15 @@ class EgrulParser:
 
     def get_expired(self) -> list:
         '''Returns expired ogrn numbers found by check_numbers()'''
-        try:
+        if self.data:
             expired = [item['o'] for item in self.data if 'e' in item]
             return expired
-        except AttributeError:
+        else:
             raise Exception('Run check_numbers() at first')
 
     def get_wrong_numbers(self) -> list:
         '''Returns ogrn numbers not found on the site'''
-        try:
+        if self.wrong_numbers:
             return self.wrong_numbers[1:]
-        except AttributeError:
+        else:
             raise Exception('Run check_numbers() at first')
