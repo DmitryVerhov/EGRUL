@@ -21,14 +21,17 @@ class EgrulParser:
         # Generating headers
         self.HEADERS = Headers(browser="chrome", os="win", headers=True).generate()
 
-    def try_post(self, url: str, 
-                 data: dict, retry: int = 5) -> requests.models.Response:
+    def try_post(self,
+                 url: str,
+                 data: dict,
+                 retry: int = 5) -> requests.models.Response:
         """Makes 'post' requests to the url with retry logic in case of failure."""
         try:
             response = requests.post(url=url, data=data, headers=self.HEADERS)
             if response.status_code != 200:
                 raise
-        except:
+        except Exception as e:
+            print(e.message, e.args)
             sleep(randint(30, 50))
             if retry:  # retries several times (default - 5)
                 print(f"Request retries left: {retry}")
@@ -44,7 +47,8 @@ class EgrulParser:
             response = requests.get(url=url, headers=self.HEADERS)
             if response.status_code != 200:
                 raise
-        except:
+        except Exception as e:
+            print(e.message, e.args)
             sleep(randint(30, 50))
             if retry:  # retries several times (default - 5)
                 print(f"Request retries left: {retry}")
@@ -54,7 +58,8 @@ class EgrulParser:
         else:
             return response
 
-    def check_numbers(self, numbers: Union[list, tuple], 
+    def check_numbers(self,
+                      numbers: Union[list, tuple],
                       progress_bar: bool = True) -> None:
         """Takes a list or tuple of numbers as an argument
         and check each number in the list for expiration.
@@ -78,7 +83,8 @@ class EgrulParser:
                 else:
                     self.wrong_numbers.append(ogrn)
                 sleep(randint(1, 5))
-            except:
+            except Exception as e:
+                print(e.message, e.args)
                 self.wrong_numbers.append(ogrn)
                 continue
             pbar.set_description(f"Processing {ogrn}")

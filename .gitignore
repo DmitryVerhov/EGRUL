@@ -3,3 +3,5 @@ __pycache__
 ogrn.xlsx
 env
 test.py
+tox.ini
+.idea
