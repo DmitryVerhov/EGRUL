@@ -19,13 +19,17 @@ class EgrulParser:
         self.home_url = "https://egrul.nalog.ru"
         self.search_url = "https://egrul.nalog.ru/search-result/"
         # Generating headers
-        self.HEADERS = Headers(browser="chrome", os="win", headers=True).generate()
+        self.HEADERS = Headers(browser="chrome",
+                               os="win",
+                               headers=True).generate()
 
     def try_post(self,
                  url: str,
                  data: dict,
                  retry: int = 5) -> requests.models.Response:
-        """Makes 'post' requests to the url with retry logic in case of failure."""
+        """Makes 'post' requests to the url
+        with retry logic in case of failure.
+        """
         try:
             response = requests.post(url=url, data=data, headers=self.HEADERS)
             if response.status_code != 200:
@@ -42,7 +46,9 @@ class EgrulParser:
             return response
 
     def try_get(self, url: str, retry: int = 5) -> requests.models.Response:
-        """Makes get-requests to the url with retry logic in case of failure."""
+        """Makes get-requests to the url
+        with retry logic in case of failure.
+        """
         try:
             response = requests.get(url=url, headers=self.HEADERS)
             if response.status_code != 200:
@@ -75,7 +81,8 @@ class EgrulParser:
                 if len(str(ogrn)) < 13:  # pre-check for short numbers
                     raise
                 # Getting client token, using his orgn number
-                token = self.try_post(self.home_url, data={"query": ogrn}).json()["t"]
+                token = self.try_post(self.home_url, 
+                                      data={"query": ogrn}).json()["t"]
                 client_url = self.search_url + token
                 client_info = self.try_get(client_url).json()["rows"]
                 if len(client_info) != 0:
